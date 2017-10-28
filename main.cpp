@@ -22,6 +22,8 @@ int comp(Interval x, Interval y)
 int main()
 {
     ifstream f("date.in");
+    ofstream g("date.out");
+    
     int a,b;
     f >>a >>b;
 
@@ -63,10 +65,10 @@ int main()
 
 
     if(a<b)
-        cout<<-1;
+        g<<-1;
     else
         for(int i=0; i<intervalSolutie.size(); i++)
-            cout<<intervalSolutie[i].a<<" "<<intervalSolutie[i].b<<endl;
+            g<<intervalSolutie[i].a<<" "<<intervalSolutie[i].b<<endl;
 
 
     return 0;
