@@ -3,20 +3,19 @@
 #include <cstdlib>
 #include <vector>
 #include <algorithm>
-#include <limits>
 
 using namespace std;
 
-struct activitate
+struct Interval
 {
-    int h,till,nr;
+    int a,b;
 };
 
-int comp(activitate a, activitate b)
+int comp(Interval x, Interval y)
 {
-    if((a.till-a.h)-(b.till-b.h) > 0)
+    if(x.a>y.a)
         return 0;
-    else
+    if(x.a<=y.a)
         return 1;
 }
 
@@ -25,33 +24,51 @@ int main()
     ifstream f("date.in");
     ofstream g("date.out");
 
-    int n; f >>n;
+    int a,b;
+    f >>a >>b;
 
-    vector <activitate> activitati;
-    activitate aux;
+    int nr;
+    f>>nr;
 
-    for(int i=0; i<n; i++)
+    vector <Interval> interval;
+    Interval aux;
+    for(int i=1; i<=nr; i++)
+       {
+           f >> aux.a >> aux.b;
+            interval.push_back(aux);
+       }
+
+    sort (interval.begin(), interval.end(), comp); //ordonare intervale crescator dupa marginea stanga
+
+    vector <Interval> intervalSolutie;    //vectorul cu intervalele ce compun solutia daca exista
+    Interval greed=interval[0];  //variabila tip interval ce retine cea mai buna solutiepana cand se ajunge la un element din vector cu marginea stanga mai mare decat  marginea stanga a intervalului dat la inceput
+    for(int i=1; i<interval.size(); i++)       //Parcurgem vectorul de intervale
     {
-        f >> aux.h >> aux.till;
-        aux.nr = i+1;
-        activitati.push_back(aux);
+        if(interval[i].a > a)
+            if(greed.a <= a && greed.b > a)
+                {
+                    a = greed.b; intervalSolutie.push_back(greed); greed = interval[i];  //mereu se micsoreaza interalul dat la inceput, noua lui margine stanga fiind marginea dreapta a lui greed
+                }
+                else
+                ;
+        else
+            if(greed.b < interval[i].b)
+            greed = interval[i];
+
     }
 
 
-    sort(activitati.begin(),activitati.end(),comp);
+    if(greed.a <= a && greed.b > a)
+    {
+        a = greed.b; intervalSolutie.push_back(greed);
+    }
 
 
-
-    int greed=0,maxi=numeric_limits<int>::max();
-
-    for(int i=0; i<activitati.size(); i++)
-        {   g << "activitatea " << activitati[i].nr << ": intervalul " << greed << " ";
-            greed = greed + activitati[i].h;
-            g << greed<< " interziere ";
-            maxi = max(0,greed-activitati[i].till);
-            g << maxi << endl;
-        }
-    g << "Intarziere planificare " << maxi << endl;
+    if(a<b)
+        g<<-1;
+    else
+        for(int i=0; i<intervalSolutie.size(); i++)
+            g<<intervalSolutie[i].a<<" "<<intervalSolutie[i].b<<endl;
 
 
     return 0;
